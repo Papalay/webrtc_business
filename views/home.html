@@ -1,0 +1,348 @@
+<!doctype html>
+<html ng-app="connexion">
+    <head>
+        <meta charset="utf-8">
+      <script src="//cloud.apizee.com/libs/jquery-1.9.0.min.js"></script>
+      <script src="//cloud.apizee.com/apiRTC/apiRTC-latest.min.js"></script>
+      <link src="../css/bootstrap.min.css">
+      <script src="../angular-1.5.x/angular.min.js"></script>
+      <script src="../node_modules/angular-route/angular-route.min.js"></script>
+      <script src="../js/angular-ui-router.min.js"></script>
+      <script src="../js/controller.js"></script>
+      <script src="../js/ion.sound.js"></script>
+      <script src="../js/script.js"></script>
+        <script src="../js/jquery-2.2.0.min.js"></script>
+        <style>
+         /*   
+        iframe{
+                height: 410px;
+                width:  310px;
+                position: absolute;
+                right: 0px;
+                bottom: 0;
+                overflow: hidden;
+                border: none;
+            
+            }*/
+        </style>
+    </head>
+        <body>
+       <div class="container" ng-controller="homeCtrl" style="position : relative;">
+           <legend>Login page</legend>
+           <div class="col-md-8">
+             <label for="name">User :</label>
+               <span id="login">{{user.login}}</span>
+           </div>
+           <div class="col-md-4" id="visitor-layout">
+               <table class="table table-bordered table-striped table-condensed" style="">  
+                   <thead>     
+                       <tr><th>Visiteurs</th></tr>            
+                   </thead>
+                   <tbody  class="success" id="visitors">
+                   </tbody>
+               </table>
+           </div>
+           <div class="row" id="iframes" style="bottom:0;"> 
+               <div class="col-md-9">
+                   <div id="menu" style="display : none;">
+                   <input id="hangup" class="btn btn-danger" type="button" disabled="true" value="Raccrocher" />
+                    <!--Accept-Refuse-->
+                    <input id="accept" class="btn btn-success" type="button" disabled="true" value="Accepter" />
+                    <input id="refuse" class="btn btn-warning" type="button" disabled="true" value="Refuser" />
+                   </div>
+                       <div class="row">
+                       <div id="remote" style="width:100%;"></div>
+                       <div id="mini"></div>
+                   </div>    
+               </div>
+           </div>        
+        </div>
+        <script src="../js/jquery-2.2.0.min.js"></script>
+        <script src="../js/bootstrap.min.js"></script>
+        <script src="../js/script.js"></script>
+        <script src="../js/jquery-ui.min.js"></script>
+        <script type="text/javascript">
+             'use strict';
+        
+            var session = null,
+                imClient = null,
+                listId = null,
+                date  = '',
+                utc = '', utc_r, 
+                lastDest = [],
+                destVisitorId ='',
+                lastUsers = [],
+                webRTCClient = null,
+                incomingCallId =0;
+         
+                function startIM(destId){
+                if($.inArray(destId, lastDest)==-1){
+                    lastDest.push(destId); 
+                    $('#iframes').append('<iframe src="plugin-front-1.html" class="col-md-3 pull-right" scrolling="no"></iframe>');
+                    $('#iframes').children().last().attr("id", destId);
+                    $('#'+destId).css({'height' : '410px', 'width ': '310', 'position ': 'absolute', 'right': '0px','bottom': '0',
+                                      'overflow': 'hidden', 'border' : 'none'});
+                    $('#'+destId).load(function(){  
+                        $('#'+destId).contents().find('[id="text-input"]').keyup( function(e){
+                            if(e.keyCode ==13){
+                                var message = $('#'+destId).contents().find('[id="text-input"]').val();
+                                 $('#'+destId).contents().find('[id="text-input"]').val('');
+                                sendIMMessage(destId, message);
+                            }
+                        });
+                    });
+                }
+                     
+            }
+            function sendIMMessage(destId, message){
+                 if(message.trim() != ""){
+                     imClient.sendMessage(destId, message);   
+                     $('#'+destId).contents().find('[id="chat-messages"]').append('<li class="bubbledLeft">'+message+'</li>');
+                     $('#'+destId).contents().find('[id="chat-messages"]').append('<li class="textLeft" style="float : right; font-size : 10px; list-style : none;">'+getHeure(new Date())+'</li>');
+                     $('#'+destId).contents().find('[id="chat-messages"]').
+                     animate({scrollTop: $('#'+destId).contents().find('[id="chat-messages"]')[0].scrollHeight},2000);
+                 }
+                lastUsers.push(destId); 
+            }
+            function receiveIMMessageHandler(e){
+                //$('#'+e.detail.senderId).attr('src', 'plugin-front-1.html');
+                startIM(e.detail.senderId); 
+                $('#'+e.detail.senderId).load(function(){
+                    if( $('#'+e.detail.senderId).contents().find('[id="chat-plus-back"]').css('display') == 'none')
+                        $('#'+e.detail.senderId).contents().find('[id="chat-plus-back"]').css({'display': 'block'});    
+                    if( $('#'+e.detail.senderId).contents().find('[id="foot-back"]').css('display') =='block' )
+                        $('#'+e.detail.senderId).contents().find('[id="foot-back"]').css({'display' : 'none'});      
+                });
+                         var element = '<li class="bubbledRight" >'+e.detail.message+'</li>'+                
+                            '<span class="textRight" style="float : left; font-size : 10px; list-style : none;">'+
+                                            getHeure(e.detail.time)+'</span>';
+                          if (e.detail.message !='null'){        
+                              $('#'+e.detail.senderId).contents().find('[id="chat-messages"]').append(element);
+                              ion.sound.play("facebook");
+                              $('#'+e.detail.senderId).contents().find('[id="chat-icon"]').css({'display': 'block'});
+                              $('#'+e.detail.senderId).contents().find('[id="chat-messages"]').
+                              animate({scrollTop: $('#'+e.detail.senderId).contents().find('[id="chat-messages"]')[0].scrollHeight},2000); 
+                              $('#'+e.detail.senderId).contents().find('[id="chat"]').css({'visibility' : 'visible'});
+                          }
+            }
+            function receiveInfo(e){
+                 date =  e.detail.time.getDate()+"/"+(e.detail.time.getMonth()+1)+"/"+e.detail.time.getFullYear();
+                $('#date').css({'display' : 'block'});
+                 $('#date').html(date);
+                 listId = e.detail.connectedUsersListWithStatus;
+                 for(var i=0; i<listId.length; i++){                     
+                     if( apiCC.session.apiCCId != listId[i].userId && listId[i].group !='undefined'){
+                         if ($.inArray(listId[i].userId, lastUsers)== -1){
+                             lastUsers.push(listId[i].userId);
+                             var el = angular.element(document.querySelector('#visitors'));
+                             el.append('<tr><td class="btn btn-success visitor">'+listId[i].userId+'</td></tr>');
+                         }
+                     }
+                 }
+             }
+             function getHeure(date){
+                 var heures = ("0" +date.getHours()).slice('-2');
+                 var minutes = ("0" +date.getMinutes()).slice('-2');
+                 return (heures+ ":"+minutes);
+             }
+            function addStreamInDiv(stream, callType, divId, mediaEltId, style, muted) {
+                var mediaElt = null,
+                    divElement = null;
+                if (callType === 'audio') {
+                    mediaElt = document.createElement("audio");
+                } else {
+                    mediaElt = document.createElement("video");
+                }
+                mediaElt.id = mediaEltId;
+                mediaElt.autoplay = true;
+                mediaElt.muted = muted;
+                mediaElt.style.width = style.width;
+                mediaElt.style.height = style.height;
+                divElement = document.getElementById(divId);
+                divElement.appendChild(mediaElt);
+                webRTCClient.attachMediaStream(mediaElt, stream);
+            }
+            function removeElementFromDiv(divId, eltId) {
+                var element = null,
+                    divElement = null;
+                element = document.getElementById(eltId);
+                if (element !== null) {
+                    console.log('Removing video element with Id : ' + eltId);
+                    divElement = document.getElementById(divId);
+                    divElement.removeChild(element);
+                }
+            }
+            function initMediaElementState(callId) {
+                //function that remove media element on hangup
+            //You can decide to manage your own stream display function or use the integrated one of ApiRTC
+            /*
+                removeElementFromDiv('mini', 'miniElt-' + callId)
+                removeElementFromDiv('remote', 'remoteElt-' + callId)
+            */
+                webRTCClient.removeElementFromDiv('mini', 'miniElt-' + callId);
+                webRTCClient.removeElementFromDiv('remote', 'remoteElt-' + callId);
+            }
+            function addHangupButton(callId) {
+                var hangupButtons = document.getElementById("hangupButtons"),
+                    input = document.createElement("input");
+                input.setAttribute("id", "hangup-" + callId);
+                input.setAttribute("value", "hangup-" + callId);
+                input.setAttribute("type", "button");
+                input.setAttribute("onclick", "webRTCClient.hangUp(" + callId + " );");
+            }
+            function removeHangupButton(callId) {
+                var hangupButtonId = 'hangup-' + callId,
+                    hangupButton = document.getElementById(hangupButtonId),
+                    hangupButtons = null;
+                if (hangupButton !== null) {
+                    console.log('Removing hangUpButton with Id : ' + hangupButtonId);
+                    hangupButtons = document.getElementById("hangupButtons");
+                    hangupButtons.removeChild(hangupButton);
+                }
+            }
+            function userMediaErrorHandler(e) {
+                $("#hangup").attr("disabled", false).val("Raccrocher");
+            }
+            function hangupHandler(e) {
+                console.log('hangupHandler :' + e.detail.callId);
+                console.log(e.detail.reason);
+                initMediaElementState(e.detail.callId);
+                removeHangupButton(e.detail.callId);
+                $('#menu').css({'display' : 'none'});
+                //$('#'+e.detail.remoteId).attr('src', 'plugin-front-1.html');
+                ion.sound.play('hangup');
+            }
+             function incomingCallHandler(e) {
+                //$("#hangup").attr("disabled", false).val("Hangup");
+                 $('#menu').show('explode');
+                $("#accept").attr("disabled", false).val("Accepter");
+                $("#refuse").attr("disabled", false).val("Refuser");
+                    if(e.detail.callType === 'media'){
+                    ion.sound.play("iphone");               
+                }
+                addHangupButton(e.detail.callId);
+        //Accept-Refuse
+                incomingCallId = e.detail.callId;
+            }
+             function userMediaSuccessHandler(e) {
+                console.log("userMediaSuccessHandler e.detail.callId :" + e.detail.callId);
+                console.log("userMediaSuccessHandler e.detail.callType :" + e.detail.callType);
+                console.log("userMediaSuccessHandler e.detail.remoteId :" + e.detail.remoteId);
+                //Adding local Stream in Div. Video is muted
+            //You can decide to manage your own stream display function or use the integrated one of ApiRTC
+            /*
+                addStreamInDiv(e.detail.stream, e.detail.callType, "mini", 'miniElt-' + e.detail.callId,
+                               {width : "160px", height : "120px"}, true);
+            */
+                webRTCClient.addStreamInDiv(e.detail.stream, e.detail.callType, "mini", 'miniElt-' + e.detail.callId,
+                               {width : "128px", height : "96px"}, true);
+            }
+            function remoteStreamAddedHandler(e) {
+                console.log("remoteStreamAddedHandler, e.detail.callId :" + e.detail.callId);
+                console.log("remoteStreamAddedHandler, e.detail.callType :" + e.detail.callType);
+                console.log("userMediaSuccessHandler e.detail.remoteId :" + e.detail.remoteId);
+                //Adding Remote Stream in Div. Video is not muted
+            //You can decide to manage your own stream display function or use the integrated one of ApiRTC
+            /*
+                addStreamInDiv(e.detail.stream, e.detail.callType, "remote", 'remoteElt-' + e.detail.callId,
+                               {width : "640px", height : "480px"}, false);
+            */
+                
+                webRTCClient.addStreamInDiv(e.detail.stream, e.detail.callType, "remote", 'remoteElt-' + e.detail.callId,
+                               {width : "640px", height : "480px"}, false);
+            }
+            
+            
+            /*
+            */
+            function sessionReadyHandler(e){
+                 apiRTC.addEventListener("updatePresence", receiveInfo);
+                 apiRTC.addEventListener("receiveIMMessage", receiveIMMessageHandler);
+                apiRTC.addEventListener("userMediaSuccess", userMediaSuccessHandler);
+                  apiRTC.addEventListener("incomingCall", incomingCallHandler);
+                apiRTC.addEventListener("userMediaError", userMediaErrorHandler);
+                apiRTC.addEventListener("hangup", hangupHandler);
+                apiRTC.addEventListener("remoteStreamAdded", remoteStreamAddedHandler);
+
+                 imClient = apiCC.session.createIMClient();
+                    webRTCClient = apiRTC.session.createWebRTCClient({
+                           });
+                 //Multi calls Activation
+                webRTCClient.setAllowMultipleCalls(true);
+            //Bandwitdh limitation
+                webRTCClient.setVideoBandwidth(300);
+            //Accept-Refuse
+                webRTCClient.setUserAcceptOnIncomingCall(true);
+
+                $("#hangup").click(function () {
+                    webRTCClient.hangUp();
+                    ion.sound.stop("iphone"); 
+                    $('#menu').css({'display' : 'none'});
+                });
+                $("#accept").click(function () {
+                    $("#accept").attr("disabled", true).val("Accepter");
+                    $("#refuse").attr("disabled", true).val("Refuser");
+                    $("#hangup").attr("disabled", false).val("Raccrocher");
+                    webRTCClient.acceptCall(incomingCallId);
+                    ion.sound.stop("iphone");
+                });
+
+                 $("#refuse").click(function () {
+                    $("#accept").attr("disabled", true).val("Accepter");
+                    $("#refuse").attr("disabled", true).val("Refuser");
+                    $("#hangup").attr("disabled", true).val("Raccrocher");
+                    webRTCClient.refuseCall(incomingCallId);
+                    initMediaElementState(incomingCallId);
+                    removeHangupButton(incomingCallId);
+                     ion.sound.stop("iphone"); 
+                     $('#menu').css({'display' : 'none'});
+                });
+                $(document).on('click', '.visitor', function(e){
+                     var el = e.target;
+                     var id = el.innerHTML;
+                     startIM(el.innerHTML);
+                    //sendIMMessage(el.innerHTML, '');
+                     $('#'+id).load( function(){
+                         $('#'+id).contents().find('[id="contact"]').html('<i class="fa fa-circle" aria-hidden="true" style ="color : green; font-size:12px;"><em> en ligne</em></i>');
+                         $('#'+id).contents().find('[id="visitorId"]').html('<td class="btn btn-success">'+id+'</td>');
+                         $('#'+id).contents().find('[id="date"]').css({'display' : 'block'});
+                         $('#'+id).contents().find('[id="date"]').html(date);
+                         $('#'+id).contents().find('[id="video-call"]').click(function(){
+                             $("#hangup").attr("disabled", false).val("Raccrocher");
+                             $('#'+id).contents().find('[id="video-call"]').unbind('click');
+                             var callId = webRTCClient.call(id);
+                             if (callId != null) {
+                                 addHangupButton(callId);
+                             }
+                             $('#menu').show('explode'); //size, puff
+                               //$('#hangup').attr('disabled', false);
+                         });
+                     });                     
+                     lastDest.push(el.innerHTML);      
+                 });
+               
+            }
+             apiRTC.init({
+                 apiKey :'badedb11c75abb4a254d0f268452bf48',
+                 presenceGroup : 'A',
+                 subscribeToPresenceGroup  : 'V',
+                 nickname : 'Admin',
+                 onReady : sessionReadyHandler,
+             });
+              $(document).ready(function(){   
+                   ion.sound({
+                       sounds: [
+                           {name: "beer_can_opening"},
+                           {name: "bell_ring"},
+                           {name : "facebook"},
+                           {name : "iphone" , loop : 4},
+                           {name : 'hangup'}
+                       ],
+                       path: "../sounds/",
+                       preload: true,
+                       volume: 1.0
+                   });
+             });
+        </script>
+      </body>
+</html>

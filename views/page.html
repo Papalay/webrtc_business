@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+     iframe{
+                height: 500px;
+                width:  100%;
+                position: absolute;
+                right: 0px;
+                bottom: 0;
+                overflow: hidden;
+                border: none;
+            }
+            
+        </style>
+    </head>
+    <body>
+        <script src="../js/jquery-2.2.0.min.js"></script>
+        <script src="../js/script.js"></script>
+       <!--
+        <script type="text/javascript" src="../js/iframeheight.min.js"></script> 
+-->
+        <script src="../js/jquery-iframe-auto-height.js"></script>
+        <script src="../js/jquery.browser.js"></script>
+      <!--
+        <script src="../js/iframeResizer.min.js"></script>
+       <style>iframe{width:100%; right:0px}</style>-->
+       <iframe src="plugin-front.html" scrolling = 'no' id="myIframe"></iframe>
+   
+        <script>
+
+            $(document).ready(function(){
+                /*
+                $('#myIframe').iframeHeight({
+                    minimumHeight : 200,
+                    defaultHeight : 200,
+                    debugMode : true
+                });
+                */
+                 $('iframe').iframeAutoHeight({
+                     minHeight: 240, // Sets the iframe height to this value if the calculated value is less
+                     heightOffset: 50 // Optionally add some buffer to the bottom
+                 });
+            })
+        </script>
+    </body>
+</html>

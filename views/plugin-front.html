@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html>
+   <head>
+        <style>
+           .cacher{ visibility: hidden;}
+           #chat-plus{
+               position: relative;
+               height : auto;
+           }
+           #chat-minus{ background-color: #043867;}
+           #chat-messages {
+               display: block;
+               height: 140px;
+               overflow-y:scroll;      
+           }
+           .media-icon{font-size: 20px;}
+           .container{position: relative;}
+           #chat-head{
+               border: solid 1px #d8e7f8 ;    
+               background-color:  #fafcfe;
+           }
+           #chat-body {
+               margin-bottom: 40px;
+               position: static;
+               background-color: #3b725e;
+               border: solid 1px #d8e7f8 ;   
+           }
+           #text-input{
+               overflow-y: hidden;
+               height: 50px;
+               margin-bottom: 10px;
+           }
+           p{color: white;}
+           .icons{width : 35px; height : 35px; border-radius : 35px;}
+           textarea{ 
+               padding: 0px;
+               width: 278px;
+               height: 100%;
+               display: inline-block;
+               outline: 0px;
+               border-width: 0px;
+               resize: none;
+               border-width: 1px;
+               border-color: black;
+               border-style: solid;
+               font-size: 12px;
+               padding: 10px;
+               border-top-width: 0px;
+            }
+           .glyphicon:hover{color: forestgreen;}
+           #date{text-decoration-line: underline;}
+           #foot {
+               bottom: 0px;
+               position: fixed; 
+           }           
+           .commentArea {
+               font: 12px Arial;
+               padding: 0 10px;
+               margin-top: 20px;
+           }
+           .bubbledLeft,.bubbledRight {
+               margin-top: 20px;
+               padding: 5px 9px;
+               max-width: 50%;
+               clear: both;
+               position: relative;
+               list-style: none;
+           }
+           .bubbledLeft{
+                float: left;
+                margin-right: auto;
+               -webkit-border-radius: 8px 8px 8px 0px;
+               -moz-border-radius: 8px 8px 8px 0px;
+               -o-border-radius: 8px 8px 8px 0px;
+               -ms-border-radius: 8px 8px 8px 0px;
+                border-radius: 8px 8px 8px 0px;
+                background-color: #65B045;
+                color: #ffffff;
+           }
+           .bubbledLeft:before { 
+               border-bottom: 10px solid #65B045;
+               border-left: 9px solid rgba(0, 0, 0, 0);
+               position: absolute;
+               bottom: 0;
+               left: -8px;
+               content: "";
+           }
+           .bubbledRight{
+               float: right;
+               margin-left: auto;
+               text-align: right;
+              -webkit-border-radius: 8px 8px 0px 8px;
+              -moz-border-radius: 8px 8px 0px 8px;
+              -o-border-radius: 8px 8px 0px 8px;
+              -ms-border-radius: 8px 8px 0px 8px;
+               border-radius: 8px 8px 0px 8px;
+               background-color: #07D;
+               color: white;
+           }
+           .bubbledRight:before {
+               border-bottom: 9px solid #07D;
+               border-right: 9px solid rgba(0, 0, 0, 0);
+               position: absolute;
+               bottom: 0;
+               right: -8px;
+               content: "";
+           }
+           .textLeft {
+               background: #65B045;
+           }
+           .textRight {
+               background: #07D;
+           }
+           .wide{
+               width:1800px !important;
+               height: 1800px !important;
+           }  
+           .small{
+               width: 400px !important;
+               height:400px !important;
+           }
+           #audio {
+               -moz-box-shadow: 0 0 5px 5px #888;
+               -webkit-box-shadow: 0 0 5px 5px#888;
+               box-shadow: 0 0 5px 5px #888;
+           }
+       </style>
+       <meta name="viewport" content="width=device-width, initial-scale=1.0" charset="utf-8">
+       <title></title>
+       <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+       <link rel="stylesheet" href="css/font-awesome-animation.min.css">
+       <link rel="stylesheet" href="css/bootstrap.css">
+       <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+       <link rel="stylesheet" href="css/custom-theme/jquery-ui-1.10.0.custom.css">
+       <link rel="stylesheet" href="assets/css/font-awesome.min.css">
+       <link rel="stylesheet" href="assets/css/docs.css">
+       <link rel="stylesheet" href="assets/js/google-code-prettify/prettify.css">
+       
+   <script src="js/jquery-2.2.0.min.js"></script>
+       <script src="js/ion.sound.js"></script>
+       
+       <script src="js/timer.jquery.js"></script>
+       
+    </head>
+    <body id="body">
+        <div class="container row" id="chatbox" style=" vertical-align: top;">   
+            <div class="col-md-9" id="media">
+                <div id="menu" style="display : none; " class= "pull-right">
+                    <button class="btn btn-danger" id="hangup" style="width : 50px; height : 50px; border-radius : 50px;">
+                        <span class="fa fa-phone" aria-hidden="true" style="font-size : 15px;"></span>
+                    </button>
+                    <button class="btn btn-success" id="accept" style="width : 50px; height : 50px; border-radius : 50px;" disabled="true">
+                        <span class="fa fa-phone" aria-hidden="true" style="font-size : 15px;"></span>
+                    </button>
+                </div>
+                <div id="menuScreenSharing" style="display : none;">
+                  <input  id="hangupScreenSharing" class="btn btn-danger" value="Arrêter le partage" />
+                </div>
+                <div id="remote" style="width:100%;" title="Remote video"></div>
+                <div id="mini"></div>
+                <div id="audio" style="display: none; height:50px; width : 180px;" class="col-xs-4 bg-info fa-border">
+                           <div id="timer"></div>
+                           <i class="fa fa-spinner fa-pulse fa-3x fa-fw margin-bottom" style="margin-left : 60px;" id="call-going"></i>
+                </div>
+            </div>
+            <div class="col-md-3 pull-right" style="vertical-align: top;">
+                <div class="row " id="chat-space" style="">
+                <div id="chat-plus" style="" class="">
+                    <span id="contact"></span>
+                    <div class="row thumbnail shadow-depth-4" id="chat-head" style="margin-bottom : 0px;">
+                        <button class="btn icon" href="#" style="background : #fafcfe;" title="Appel audio"><span class= "glyphicon glyphicon-earphone media-icon " id="audio-call" ></span></button>        
+                        <button class="btn icon" id="video-call" style="background : #fafcfe;" title="Appel vidéo">
+                            <span class="glyphicon glyphicon-facetime-video media-icon"></span>
+                        </button> 
+                        <button class="btn icon" href="" id="screenSharing" style="background : #fafcfe;" title="Partage d'écran">
+                         <span class="fa fa-desktop" aria-hidden="true"></span>
+                        </button>
+                        <span class="col-xs-1"  id="chat-icon" style="display : none;" >
+                            <i class="fa fa-weixin" aria-hidden="true"   style="color : orange;"></i>
+                        </span>
+                        <div class="col-xs-1 pull-right">
+                            <a href="#" id="minus" title="Réduire"><span class="glyphicon glyphicon-minus" ></span></a>
+                        </div>
+                    </div>
+                    <div class="row"  id="chat-body" style="">
+                        <div class="messages"  style="border-bottom : solid 1px;">
+                            <p id="date" style="display : none; text-align : center; font-size : 10px;"></p>
+                            <ul id="chat-messages" style=""  class="commentArea"></ul>
+                        </div>
+                        <div class="row" id="chat-footer"  style="margin-bottom : 0px;">
+                            <div class="col-md-10" style="margin-left : 15px; ">
+                                <textarea class="form-control" rows="1" style="resize : none ;font-size : 12px;" placeholder="Tapez votre message ici"
+                              id="text-input"></textarea>
+                            </div>
+                            <div id="tipping-notif" style="visibility : hidden;">
+                                <i class="fa fa-circle-o faa-burst animated " style="background-color : white;"></i>
+                            </div>
+                        </div>
+                          
+                    </div>
+                </div>
+            </div>
+            <div  class="row" id="foot"  style= "">   
+                  <table class="table table-bordered table-striped table-condensed" style="">
+                      <thead>
+                          <tr class="bg-primary">
+                              <th style="width:200px;">Nos agents</th>
+                          </tr>            
+                      </thead>
+                      <tbody  class="success" id="contacts">
+                      </tbody>
+                      <tfoot>
+                          <tr>
+                              <td class="text-sm"><small id="available"></small></tfoot></td>
+                          </tr>
+                     </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>   
+    <script src="js/jquery-ui.min.js"></script> 
+    <script type="text/javascript">       
+    'use strict';        
+        var session = null,   
+            imClient = null,     
+            listId = null,
+            date  = '',
+            utc = '', utc_r,
+            lastUsers = [],
+            webRTCClient = null,
+            incomingCallId =0,
+            callerId =0,
+            callType = '',
+            destinationId =0;
+    /*
+       Initialiastion de la fenêtre de messagerie instantanée. La fonction reçoit comme paramètre
+       l'id du destinataire du message.
+    */
+    function startIM(destId){                
+        $('#text-input').keyup( function(e){        
+            destinationId = destId;
+            if(e.keyCode ==13){
+                var message = $("#text-input").val();$('#text-input').val('');
+                sendIMMessage(destId, message);
+                e.preventDefault();
+            }
+        });
+    }
+        /*  Envoi d'un message instantané (@message)  au destinataire (@destId)*/
+    function sendIMMessage(destId, message){
+        if(message.trim() !=''){
+            imClient.sendMessage(destId, message);
+            if( message!='null' && message != '$Ack_Accept' && message != '//Writing\\_'){
+                $('#chat-messages').append('<li class="bubbledLeft">'+message+'</li>');
+                $('#chat-messages').append('<li class="textLeft" style="float : right; font-size : 10px; list-style : none; display : none;">'+
+                                           getHeure(new Date())+'</li>');            
+                $('#chat-messages').animate({scrollTop: $('#chat-messages')[0].scrollHeight},2000);             
+            }        
+        }        
+        lastUsers.push(destId);         
+    }
+        /*  Evènement qui se déclance après réception d'un message  */
+    function receiveIMMessageHandler(e){
+        if( $('#chat-plus').css('display') == 'none'){
+            $('#chat-plus').css({'display': 'block'});
+            $('#foot').css({'display' : 'none'});
+        }
+        if( e.detail.message == '$Ack_Accept'){
+            ion.sound.stop('skype');
+            ion.sound.stop('skype');
+            $('#call-going').css({'display' : 'none'});
+            $('#timer').timer();                          
+        }         
+        else{
+            startIM(e.detail.senderId);
+                $('#tipping-notif').css({'visibility' : 'hidden'});
+                $('#chat-messages').append('<li class="bubbledRight" >'+e.detail.message+'</li>'+                                    
+                                           '<span class="textRight" style="float : left; font-size : 10px; list-style : none; display : none;">'+
+                                           getHeure(e.detail.time)+'</span>');      
+                ion.sound.play("facebook");    
+                $('#chat-icon').css({'display': 'block'});
+                $('#chat-messages').animate({scrollTop: $('#chat-messages')[0].scrollHeight},2000);    
+        }    
+    }            
+    function getHeure(date){
+        var heures = ("0" +date.getHours()).slice('-2');
+        var minutes = ("0" +date.getMinutes()).slice('-2');
+        return (heures+ ":"+minutes);
+    }
+    function receiveInfo(e){
+        date =  e.detail.time.getDate()+"/"+(e.detail.time.getMonth()+1)+"/"+e.detail.time.getFullYear();
+        $('#date').css({'display' : 'block'});
+        $('#date').html(date);
+        listId = e.detail.connectedUsersListWithStatus;
+        if(listId.length == 0){
+            $('#available').html('Nos agents ne sont pas disponibles.');
+        }
+        else {
+            $('#available').html('Nous sommes disponibles pour vous aider.');   
+        }
+        setInterval( function(){
+            for(var i=0; i<listId.length; i++){
+                if( apiCC.session.apiCCId != listId[i].userId && listId[i].group != 'V' && listId[i].group !='undefined'){
+                    if ($.inArray(listId[i].userId, lastUsers)== -1 && listId[i].userId != 'undefined'  && e.detail.state == 'online'){
+                        lastUsers.push(listId[i].userId);
+                        if( listId[i].callState == 'no_Call'){
+                            $('#contacts').append('<tr id='+listId[i].userId+'><td><img src="images/image-1.png" style ="height:40px; width :    40px;"><button class="btn btn-success agent">'+listId[i].userId+'</button></td></tr>');
+                        } else {
+                            $('#contacts').append('<tr id='+listId[i].userId+'><td class="glyphicon glyphicon-user"></td>'+'<td class="btn btn- danger agent">'+listId[i].userId+'</td></tr>');
+                        }   
+                    }
+                }
+            }
+        }, 3000);
+        lastUsers = [];
+        $('#contacts').empty();
+    }
+    function addStreamInDiv(stream, callType, divId, mediaEltId, style, muted) {
+        var mediaElt = null,
+            divElement = null;
+        if (callType === 'audio') {
+            mediaElt = document.createElement("audio");
+        } else {
+            mediaElt = document.createElement("video");
+        }
+        mediaElt.id = mediaEltId;
+        mediaElt.autoplay = true;
+        mediaElt.muted = muted;
+        mediaElt.style.width = style.width;
+        mediaElt.style.height = style.height;
+        divElement = document.getElementById(divId);
+        divElement.appendChild(mediaElt);
+        webRTCClient.attachMediaStream(mediaElt, stream);
+    }
+    function removeElementFromDiv(divId, eltId) {
+        var element = null,
+            divElement = null;    
+        element = document.getElementById(eltId);            
+        if (element !== null) {            
+            divElement = document.getElementById(divId);            
+            divElement.removeChild(element);
+        }
+    }
+    function initMediaElementState(callId) {
+            //function that remove media element on hangup
+            //You can decide to manage your own stream display function or use the integrated one of ApiRTC
+            /*
+                removeElementFromDiv('mini', 'miniElt-' + callId)
+                removeElementFromDiv('remote', 'remoteElt-' + callId)
+            */
+                webRTCClient.removeElementFromDiv('mini', 'miniElt-' + callId);
+                webRTCClient.removeElementFromDiv('remote', 'remoteElt-' + callId);        
+    }
+    function addHangupButton(callId) {
+        var hangupButtons = document.getElementById("hangupButtons"),
+            input = document.createElement("input");
+        input.setAttribute("id", "hangup-" + callId);
+        input.setAttribute("value", "hangup-" + callId);
+        input.setAttribute("type", "button");
+        input.setAttribute("onclick", "webRTCClient.hangUp(" + callId + " );");
+    }
+    function removeHangupButton(callId) {
+        var hangupButtonId = 'hangup-' + callId,
+            hangupButton = document.getElementById(hangupButtonId),
+            hangupButtons = null;
+        if (hangupButton !== null) {        
+            hangupButtons = document.getElementById("hangupButtons");            
+            hangupButtons.removeChild(hangupButton);        
+        }        
+    }
+    function userMediaErrorHandler(e) {
+        $("#hangup").attr("disabled", false).val("Raccrocher");
+    }            
+    function hangupHandler(e) {        
+        initMediaElementState(e.detail.callId);            
+        removeHangupButton(e.detail.callId);            
+        $('#menu').css({'display' : 'none'});
+        $('#audio').css({'display': 'none'});
+        $('#menuScreenSharing').css({'display' : 'none'});
+        ion.sound.stop("iphone");
+        ion.sound.play("hangup");
+        $('#video-call').attr('disabled', false);
+        $('#audio-call').attr('disabled', false);
+        jQuery('#media').dialog('close');
+    }
+    function incomingCallHandler(e) {
+         $('#media').dialog('open');
+        addHangupButton(e.detail.callId);
+        incomingCallId = e.detail.callId;
+        callerId = e.detail.callerId;
+        if(e.detail.callType == 'media'){
+            $("#hangup").attr("disabled", true);
+            $('#menu').show('explode');
+            $("#accept").attr("disabled", false);
+            $("#refuse").attr("disabled", false);
+            ion.sound.play("iphone");
+        }
+        if(e.detail.callType == 'audio'){
+            callType = e.detail.callType;
+            $("#hangup").attr("disabled", true);
+            $('#menu').show('explode');
+            $("#accept").attr("disabled", false);
+            $("#refuse").attr("disabled", false);
+            ion.sound.play("iphone");
+            $('#audio').css({'display': 'block'});
+        }         
+        if(e.detail.callType == 'screenSharing'){
+            $('#menuScreenSharing').show('explode');
+        }
+    }
+    function userMediaSuccessHandler(e) {
+                //Adding local Stream in Div. Video is muted
+            //You can decide to manage your own stream display function or use the integrated one of ApiRTC
+            /*
+                addStreamInDiv(e.detail.stream, e.detail.callType, "mini", 'miniElt-' + e.detail.callId,
+                               {width : "160px", height : "120px"}, true);
+            */  
+                webRTCClient.addStreamInDiv(e.detail.stream, e.detail.callType, "mini", 'miniElt-' + e.detail.callId,
+                               {width : "140px", height : "120px"}, true);
+    }
+    function remoteStreamAddedHandler(e) {
+                //Adding Remote Stream in Div. Video is not muted
+            //You can decide to manage your own stream display function or use the integrated one of ApiRTC
+            /*
+                addStreamInDiv(e.detail.stream, e.detail.callType, "remote", 'remoteElt-' + e.detail.callId,
+                               {width : "640px", height : "480px"}, false);
+            */
+                webRTCClient.addStreamInDiv(e.detail.stream, e.detail.callType, "remote", 'remoteElt-' + e.detail.callId,
+                               {width : "640px", height : "480px"}, false);
+    }
+    function desktopCaptureHandler(e) {
+                console.log("e.detail.event :" + e.detail.event);
+    }     
+    function sessionReadyHandler(e){
+        apiRTC.addEventListener("updatePresence", receiveInfo);
+        apiRTC.addEventListener("receiveIMMessage", receiveIMMessageHandler);
+        apiRTC.addEventListener("userMediaSuccess", userMediaSuccessHandler);
+        apiRTC.addEventListener("incomingCall", incomingCallHandler);
+        apiRTC.addEventListener("userMediaError", userMediaErrorHandler);
+        apiRTC.addEventListener("hangup", hangupHandler);
+        apiRTC.addEventListener("remoteStreamAdded", remoteStreamAddedHandler);
+        apiRTC.addEventListener("desktopCapture", desktopCaptureHandler);
+        
+        imClient = apiCC.session.createIMClient();
+        webRTCClient = apiRTC.session.createWebRTCClient({
+        });         
+                 
+        $(document).on('click', '.agent', function(e){
+            $('#chat-plus').show('Scale'); 
+            $('#chat-plus').css({'display' : 'block'});
+            $('#foot').css({'display' : 'none'});
+            var el = e.target;
+            startIM(el.innerHTML);
+            sendIMMessage(el.innerHTML, 'null');
+            $('#contact').html('<i class="fa fa-circle" aria-hidden="true" style ="color : green; font-size:12px;"><em> en ligne</em></i>');
+            $('#video-call').click(function(){
+                $('#media').dialog('open');
+                $("#hangup").attr("disabled", false);
+                $('#video-call').attr('disabled', true);
+                var  callId = webRTCClient.call(el.innerHTML);
+                if (callId != null) {
+                    addHangupButton(callId);
+                }
+                $('#menu').show('explode');
+                ion.sound.play("skype");
+                $('#hangup').attr('disabled', false);
+            });
+            $('#audio-call').click(function(){
+                $('#media').dialog('open');
+                $('#audio-call').attr('disabled', true);
+                var callId = webRTCClient.callAudio(el.innerHTML);
+                if (callId != null) {
+                    addHangupButton(callId);
+                }
+                $('#menu').show('explode'); 
+                $('#hangup').attr('disabled', false);
+                $('#audio').css({'display' : 'block'});
+                ion.sound.play('skype');
+            });
+            $("#screenSharing").click(function () {
+                $('#menuScreenSharing').show('explode');
+                var callId = webRTCClient.shareScreen(el.innerHTML);
+                if (callId != null) {
+                    addHangupButton(callId);
+                }
+            });
+        });
+        //Multi calls Activation
+        webRTCClient.setAllowMultipleCalls(true);
+        //Bandwitdh limitation
+        webRTCClient.setVideoBandwidth(300);
+        //Accept-Refuse
+        webRTCClient.setUserAcceptOnIncomingCall(true);
+        //ScreenSharing Activation
+        webRTCClient.activateScreenSharing();
+        $("#hangup").click(function () {
+            webRTCClient.hangUp();
+            ion.sound.stop("iphone"); 
+            $('#menu').css({'display' : 'none'});
+            $('#timer').timer('remove');
+            $('#audio').css({'display': 'none'});
+            ion.sound.stop("skype");
+        });
+        $("#accept").click(function () {
+            $("#accept").attr("disabled", true);
+            $("#refuse").attr("disabled", true);
+            $("#hangup").attr("disabled", false);
+            webRTCClient.acceptCall(incomingCallId);
+            ion.sound.stop("iphone");
+            ion.sound.stop("skype");
+            sendIMMessage(callerId, '$Ack_Accept');
+            if( callType == 'audio'){
+                $('audio').attr('muted', false);
+                $('#timer').timer();
+                $('#call-going').css({'display': 'none'});
+            }
+        });
+        $("#hangupScreenSharing").click(function () {
+            webRTCClient.hangUp();
+            ion.sound.stop("iphone"); 
+            $('#menuScreenSharing').css({'display' : 'none'});
+            ion.sound.stop("skype");
+        });
+    }
+    apiRTC.init({
+        apiKey : 'badedb11c75abb4a254d0f268452bf48',
+        presenceGroup : 'V',
+        subscribeToPresenceGroup  : 'A',
+        onReady : sessionReadyHandler
+    });
+    $(document).ready(function(){  
+        ion.sound({
+            sounds: [
+                {name: "beer_can_opening"},
+                {name: "bell_ring"},
+                {name : "facebook"},
+                {name : "iphone", loop:4},
+                {name : 'hangup'},
+                {name : "skype", loop:10}
+            ],
+            path: "sounds/",
+            preload: true,
+            volume: 1.0
+        });
+        $('textarea').click(function(){
+            $('#chat-icon').hide('hightlight');
+        })
+        $('#chat-messages').mouseenter( function(){
+            $('.textLeft').show('Scale');
+            $('.textRight').show('Scale');
+        })
+        $('#chat-messages').mouseleave( function(){
+            $('.textLeft').hide('Scale');
+            $('.textRight').hide('Scale');
+        });
+        $('#video-call').click( function(){
+           // $('#media').dialog('open');
+        });
+        $('#audio-call').click( function(){
+            //$('#media').dialog('open');
+        });        
+        jQuery("#media").dialog({
+            autoOpen: false,
+            dialogClass: "success",
+            modal: false,
+            width: 640,
+            title : 'WebRTC Communications',
+            height: 640,
+            resizable : false,
+            draggable : true,
+            show: 'blind',
+            hide: 'fold',
+            open: function(){
+                jQuery('.ui-widget-overlay').bind('click',function(){
+                    jQuery('#media').dialog('close');
+                })
+            }
+        });
+        $('#minus').click(function(){    
+            var h = $('#chat-space').height()+'px';  
+            $('#chat-plus').hide('Drop');
+            $('#chat-space').height(h);
+            $('#foot').show();
+        });
+        $('#plus').click( function(){    
+            $("#chat-minus").slideToggle( function(){
+                $('#chat-plus').show('Scale');
+            });
+        });
+        $('#hangup').click( function(){
+            jQuery('#media').dialog('close');
+        });
+        $('#chat-plus').css({'display': 'none'});
+        $('#foot').css({'display': 'block'});
+        $('#foot').draggable({ containment: 'document' });
+        $('#chat-plus' ).draggable({ containment: 'document' });
+    });
+</script>
+<script src="assets/js/google-code-prettify/prettify.js" type="text/javascript"></script>
+</body>
+</html>

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html ng-app="connexion">
+   <head>
+      <meta charset="utf-8">
+       <title></title>
+       <style>
+     
+           .cacher{
+               visibility: hidden;
+           }
+        #chat-plus{
+            position: relative;
+            height : auto;
+            
+        }
+         
+           #chat-minus{
+               background-color: #043867;
+        
+           }
+           #chat-messages {
+               display: block;
+               height: 140px;
+               overflow-y:scroll;       
+           }
+           
+           .media-icon{
+   
+              /* text-shadow: 0 0 5px green;*/
+               font-size: 20px;
+}
+           .container{
+               position: relative;
+           }
+           
+           #chat-head{
+              
+               border: solid 1px #d8e7f8 ;
+               
+               background-color:  #fafcfe;
+           }
+           #chat-body {
+               margin-bottom: 40px;
+               position: static;
+               background-color: #3b725e;/* #d0d1d0 #dde3f1;*/
+               border: solid 1px #d8e7f8 ;
+               
+           }
+           #text-input{
+               overflow-y: hidden;
+               height: 50px;
+               margin-bottom: 10px;
+           }
+           p{
+               color: white;
+            
+           }
+           /*
+           .icon{
+               width : 35px; height : 35px; border-radius : 35px;
+           }
+           */
+            .input-box
+            {
+                background-color: white;
+                height: 50px;
+                padding: 0px;
+            }
+
+            .input-box textarea
+            {
+                padding: 0px;
+                width: 278px;
+                height: 100%;
+                display: inline-block;
+                outline: 0px;
+                border-width: 0px;
+                resize: none;
+                border-width: 1px;
+                border-color: black;
+                border-style: solid;
+                font-size: 12px;
+                padding: 10px;
+                border-top-width: 0px;
+            }
+           .glyphicon:hover{
+               color: forestgreen;
+           }
+           #date{
+                text-decoration-line: underline;
+           }
+           #foot {
+            
+               bottom: 0px;
+               position: fixed; 
+           }           
+        
+.commentArea {
+    font: 12px Arial;
+    padding: 0 10px;
+    margin-top: 20px;    
+}
+
+.bubbledLeft,.bubbledRight {
+    margin-top: 20px;
+    padding: 5px 9px;
+    max-width: 50%;
+    clear: both;
+    position: relative;
+    list-style: none;
+}
+
+.bubbledLeft{
+    float: left;
+    margin-right: auto;
+    -webkit-border-radius: 8px 8px 8px 0px;
+    -moz-border-radius: 8px 8px 8px 0px;
+    -o-border-radius: 8px 8px 8px 0px;
+    -ms-border-radius: 8px 8px 8px 0px;
+    border-radius: 8px 8px 8px 0px;
+    background-color: #65B045;
+    color: #ffffff;
+}
+
+.bubbledLeft:before {
+    border-bottom: 10px solid #65B045;
+    border-left: 9px solid rgba(0, 0, 0, 0);
+    position: absolute;
+    bottom: 0;
+    left: -8px;
+    content: "";
+}
+
+.bubbledRight{
+    float: right;
+    margin-left: auto;
+    text-align: right;
+    -webkit-border-radius: 8px 8px 0px 8px;
+    -moz-border-radius: 8px 8px 0px 8px;
+    -o-border-radius: 8px 8px 0px 8px;
+    -ms-border-radius: 8px 8px 0px 8px;
+    border-radius: 8px 8px 0px 8px;
+    background-color: #07D;
+    color: white;
+}
+
+.bubbledRight:before {
+    border-bottom: 9px solid #07D;
+    border-right: 9px solid rgba(0, 0, 0, 0);
+    position: absolute;
+    bottom: 0;
+    right: -8px;
+    content: "";
+}
+.textLeft {
+        background: #65B045;
+    }
+           .textRight {
+               background: #07D;
+           }
+   
+    </style>
+     <script src="//cloud.apizee.com/libs/jquery-1.9.0.min.js"></script>
+      <script src="//cloud.apizee.com/apiRTC/apiRTC-latest.min.js"></script>
+      <link rel="stylesheet" href="../css/bootstrap.css">
+      <script src="../angular-1.5.x/angular.min.js"></script>
+      <script src="../node_modules/angular-route/angular-route.min.js"></script>
+      <script src="../js/angular-ui-router.min.js"></script>
+      <script src="../js/controller.js"></script>
+       <script src="../js/ion.sound.js"></script>
+    </head>
+    <body onunload = ""> 
+        <div class="container" id="chatbox" ng-controller = "loginCtrl">
+            <div class="col-md-3" id="chat-space" style="">
+                <div id="chat-plus-back">
+                    <span id="contact" class="label label-success"></span>
+                    <div class="row thumbnail shadow-depth-4" id="chat-head" style="margin-bottom : 0px;">
+                            <div class="col-xs-2">
+                                <a class="btn icon" href="#"><span class= "glyphicon glyphicon-earphone media-icon " id="audio-call"></span></a>
+                            </div>
+                            <div class="col-xs-2"  id="video-command">
+                                <a class="btn icon" href="#"><span class="glyphicon glyphicon-facetime-video media-icon" id="video-call"></span></a>
+                            </div>
+                            <div class="col-xs-1 pull-right">
+                                <a href="#" id="minus-back"><span class="glyphicon glyphicon-minus" ></span></a>
+                            </div>
+                    </div>
+                    <div class="row"  id="chat-body" style="">
+                        <div class="messages"  style="border-bottom : solid 1px;">
+                            <p id="date" style="display : none; text-align : center; font-size : 10px;"></p>
+                            <ul id="chat-messages" style=""  class="commentArea"></ul>
+                        </div>
+                        <div class="row" id="chat-footer"  style="margin-bottom : 0px;">
+                            <div class="col-md-10" style="margin-left : 5px;">
+                                <textarea class="form-control" rows="1" style="resize : none ;font-size : 12px;" placeholder="Tapez votre message ici"
+                              id="text-input"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+              <div  class="col-md-3" id="foot-back"  style= "margin-top : 0px; position :absolute;">   
+                  <table class="table table-bordered table-striped table-condensed" style="">
+                      <thead>
+                          <tr>
+                              <th>Visiteur</th>
+                          </tr>            
+                      </thead>
+                      <tbody  class="success">
+                          <tr id="visitorId"></tr>
+                      </tbody>
+                </table>
+            </div>
+        </div>
+        <script src="../js/jquery-2.2.0.min.js"></script> 
+        <script src="../js/jquery-ui.min.js"></script>
+        <script src="../js/bootstrap.min.js"></script>
+        <script src="../js/bootstrap-filestyle.min.js"></script>
+        <script src="../js/script.js"></script>
+        <script type="text/javascript">
+        </script>
+ </body>
+</html>
