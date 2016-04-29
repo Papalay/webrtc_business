@@ -301,7 +301,7 @@
         setInterval( function(){
             for(var i=0; i<listId.length; i++){
                 if( apiCC.session.apiCCId != listId[i].userId && listId[i].group != 'V' && listId[i].group !='undefined'){
-                    if ($.inArray(listId[i].userId, lastUsers)== -1 && listId[i].userId != 'undefined'  && e.detail.state == 'online'){
+                    if ($.inArray(listId[i].userId, lastUsers)== -1 && listId[i].userId != 'undefined'/*  && e.detail.state == 'online'*/){
                         lastUsers.push(listId[i].userId);
                         if( listId[i].callState == 'no_Call'){
                             $('#contacts').append('<tr id='+listId[i].userId+'><td><img src="images/image-1.png" style ="height:40px; width :    40px;"><button class="btn btn-success agent">'+listId[i].userId+'</button></td></tr>');
