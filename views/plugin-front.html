@@ -388,6 +388,7 @@
         $('#video-call').attr('disabled', false);
         $('#audio-call').attr('disabled', false);
         jQuery('#media').dialog('close');
+         $('#timer').timer('remove');
     }
     function incomingCallHandler(e) {
          $('#media').dialog('open');
