@@ -154,7 +154,7 @@
                     </button>
                 </div>
                 <div id="menuScreenSharing" style="display : none;">
-                  <input  id="hangupScreenSharing" class="btn btn-danger" value="Arrêter le partage" />
+                  <input type="button"  id="hangupScreenSharing" class="btn btn-danger" value="Arrêter le partage" />
                 </div>
                 <div id="remote" style="width:100%;" title="Remote video"></div>
                 <div id="mini"></div>
@@ -568,10 +568,10 @@
         });        
         jQuery("#media").dialog({
             autoOpen: false,
-            dialogClass: "success",
+            dialogClass: 'no-close success-dialog',
             modal: false,
             width: 640,
-            title : 'WebRTC Communications',
+            title : 'Ma banque Business Communication',
             height: 640,
             resizable : false,
             draggable : true,
@@ -580,6 +580,7 @@
             height : 'auto',
             width : 'auto',
             open: function(){
+              //  jQuery('.ui-dialog-titlebar').append("<img src='../images/atos.jpg' style = 'height:30px; width : 50px;'/>");
                 jQuery('.ui-widget-overlay').bind('click',function(){
                     jQuery('#media').dialog('close');
                 })
@@ -606,5 +607,48 @@
     });
 </script>
 <script src="assets/js/google-code-prettify/prettify.js" type="text/javascript"></script>
+          <style>
+            
+            .ui-widget.success-dialog {
+    font-family: Verdana,Arial,sans-serif;
+    font-size: .8em;
+}
+
+.ui-widget-content.success-dialog {
+    background: #F9F9F9;
+    border: 1px solid #90d93f;
+    color: #222222;
+}
+
+.ui-dialog.success-dialog {
+    left: 0;
+    outline: 0 none;
+    padding: 0 !important;
+    position: absolute;
+    top: 0;
+}
+
+.ui-dialog.success-dialog .ui-dialog-content {
+    background: none repeat scroll 0 0 transparent;
+    border: 0 none;
+    overflow: auto;
+    position: relative;
+    padding: 0 !important;
+    margin: 0;
+}
+
+.ui-dialog.success-dialog .ui-widget-header {
+    background: #fafcfe;
+    border: 0;
+    color: #fff;
+    font-weight: normal;
+}
+
+.ui-dialog.success-dialog .ui-dialog-titlebar {
+    padding: 0.1em .5em;
+    position: relative;
+    font-size: 1em;
+}
+            </style>
 </body>
 </html>
