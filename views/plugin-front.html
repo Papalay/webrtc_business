@@ -273,13 +273,13 @@
         }         
         else{
             startIM(e.detail.senderId);
-                $('#tipping-notif').css({'visibility' : 'hidden'});
-                $('#chat-messages').append('<li class="bubbledRight" >'+e.detail.message+'</li>'+                                    
+            $('#tipping-notif').css({'visibility' : 'hidden'});
+            $('#chat-messages').append('<li class="bubbledRight" >'+e.detail.message+'</li>'+                                    
                                            '<span class="textRight" style="float : left; font-size : 10px; list-style : none; display : none;">'+
                                            getHeure(e.detail.time)+'</span>');      
-                ion.sound.play("facebook");    
-                $('#chat-icon').css({'display': 'block'});
-                $('#chat-messages').animate({scrollTop: $('#chat-messages')[0].scrollHeight},2000);    
+            ion.sound.play("facebook");    
+            $('#chat-icon').css({'display': 'block'});
+            $('#chat-messages').animate({scrollTop: $('#chat-messages')[0].scrollHeight},2000);    
         }    
     }            
     function getHeure(date){
@@ -291,29 +291,35 @@
         date =  e.detail.time.getDate()+"/"+(e.detail.time.getMonth()+1)+"/"+e.detail.time.getFullYear();
         $('#date').css({'display' : 'block'});
         $('#date').html(date);
+        
         listId = e.detail.connectedUsersListWithStatus;
         if(listId.length == 0){
             $('#available').html('Nos agents ne sont pas disponibles.');
         }
         else {
-            $('#available').html('Nous sommes disponibles pour vous aider.');   
-        }
+            $('#available').html('Nous sommes disponibles pour vous aider.'); 
+        }    
         setInterval( function(){
             for(var i=0; i<listId.length; i++){
                 if( apiCC.session.apiCCId != listId[i].userId && listId[i].group != 'V' && listId[i].group !='undefined'){
-                    if ($.inArray(listId[i].userId, lastUsers)== -1 && listId[i].userId != 'undefined'/*  && e.detail.state == 'online'*/){
+                    if ($.inArray(listId[i].userId, lastUsers)== -1 && listId[i].userId != 'undefined' && e.detail.state == 'online'){
                         lastUsers.push(listId[i].userId);
-                        if( listId[i].callState == 'no_Call'){
-                            $('#contacts').append('<tr id='+listId[i].userId+'><td><img src="images/image-1.png" style ="height:40px; width :    40px;"><button class="btn btn-success agent">'+listId[i].userId+'</button></td></tr>');
-                        } else {
-                            $('#contacts').append('<tr id='+listId[i].userId+'><td class="glyphicon glyphicon-user"></td>'+'<td class="btn btn- danger agent">'+listId[i].userId+'</td></tr>');
-                        }   
+                        updateStatus(listId[i].userId, listId[i].callState);
                     }
-                }
+                } 
             }
         }, 3000);
-        lastUsers = [];
-        $('#contacts').empty();
+    }
+    function updateStatus(userId, state){
+         if(state !='no_Call'){
+             $('#contacts').find('[id='+userId+']').remove();
+             lastUsers.splice(lastUsers.indexOf(userId), 1);
+             $('#contacts').append('<tr id='+userId+'><td><img src= "images/image-1.png" style="height : 40px; width : 40px;"><button         class="btn btn-danger agent">'+userId+'</button></td></tr>'); 
+         }else{
+             $('#contacts').find('[id='+userId+']').remove();
+             lastUsers.splice(lastUsers.indexOf(userId), 1);
+             $('#contacts').append('<tr id='+userId+'><td><img src="images/image-1.png" style ="height:40px; width :    40px;">   <button class="btn btn-success agent">'+userId+'</button></td></tr>');
+         }
     }
     function addStreamInDiv(stream, callType, divId, mediaEltId, style, muted) {
         var mediaElt = null,
@@ -434,7 +440,7 @@
     function sessionReadyHandler(e){
         apiRTC.addEventListener("updatePresence", receiveInfo);
         apiRTC.addEventListener("receiveIMMessage", receiveIMMessageHandler);
-        apiRTC.addEventListener("userMediaSuccess", userMediaSuccessHandler);
+      // apiRTC.addEventListener("userMediaSuccess", userMediaSuccessHandler);
         apiRTC.addEventListener("incomingCall", incomingCallHandler);
         apiRTC.addEventListener("userMediaError", userMediaErrorHandler);
         apiRTC.addEventListener("hangup", hangupHandler);
