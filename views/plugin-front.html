@@ -2,128 +2,7 @@
 <html>
    <head>
         <style>
-           .cacher{ visibility: hidden;}
-           #chat-plus{
-               position: relative;
-               height : auto;
-           }
-           #chat-minus{ background-color: #043867;}
-           #chat-messages {
-               display: block;
-               height: 140px;
-               overflow-y:scroll;      
-           }
-           .media-icon{font-size: 20px;}
-           .container{position: relative;}
-           #chat-head{
-               border: solid 1px #d8e7f8 ;    
-               background-color:  #fafcfe;
-           }
-           #chat-body {
-               margin-bottom: 40px;
-               position: static;
-               background-color: #3b725e;
-               border: solid 1px #d8e7f8 ;   
-           }
-           #text-input{
-               overflow-y: hidden;
-               height: 50px;
-               margin-bottom: 10px;
-           }
-           p{color: white;}
-           .icons{width : 35px; height : 35px; border-radius : 35px;}
-           textarea{ 
-               padding: 0px;
-               width: 278px;
-               height: 100%;
-               display: inline-block;
-               outline: 0px;
-               border-width: 0px;
-               resize: none;
-               border-width: 1px;
-               border-color: black;
-               border-style: solid;
-               font-size: 12px;
-               padding: 10px;
-               border-top-width: 0px;
-            }
-           .glyphicon:hover{color: forestgreen;}
-           #date{text-decoration-line: underline;}
-           #foot {
-               bottom: 0px;
-               position: fixed; 
-           }           
-           .commentArea {
-               font: 12px Arial;
-               padding: 0 10px;
-               margin-top: 20px;
-           }
-           .bubbledLeft,.bubbledRight {
-               margin-top: 20px;
-               padding: 5px 9px;
-               max-width: 50%;
-               clear: both;
-               position: relative;
-               list-style: none;
-           }
-           .bubbledLeft{
-                float: left;
-                margin-right: auto;
-               -webkit-border-radius: 8px 8px 8px 0px;
-               -moz-border-radius: 8px 8px 8px 0px;
-               -o-border-radius: 8px 8px 8px 0px;
-               -ms-border-radius: 8px 8px 8px 0px;
-                border-radius: 8px 8px 8px 0px;
-                background-color: #65B045;
-                color: #ffffff;
-           }
-           .bubbledLeft:before { 
-               border-bottom: 10px solid #65B045;
-               border-left: 9px solid rgba(0, 0, 0, 0);
-               position: absolute;
-               bottom: 0;
-               left: -8px;
-               content: "";
-           }
-           .bubbledRight{
-               float: right;
-               margin-left: auto;
-               text-align: right;
-              -webkit-border-radius: 8px 8px 0px 8px;
-              -moz-border-radius: 8px 8px 0px 8px;
-              -o-border-radius: 8px 8px 0px 8px;
-              -ms-border-radius: 8px 8px 0px 8px;
-               border-radius: 8px 8px 0px 8px;
-               background-color: #07D;
-               color: white;
-           }
-           .bubbledRight:before {
-               border-bottom: 9px solid #07D;
-               border-right: 9px solid rgba(0, 0, 0, 0);
-               position: absolute;
-               bottom: 0;
-               right: -8px;
-               content: "";
-           }
-           .textLeft {
-               background: #65B045;
-           }
-           .textRight {
-               background: #07D;
-           }
-           .wide{
-               width:1800px !important;
-               height: 1800px !important;
-           }  
-           .small{
-               width: 400px !important;
-               height:400px !important;
-           }
-           #audio {
-               -moz-box-shadow: 0 0 5px 5px #888;
-               -webkit-box-shadow: 0 0 5px 5px#888;
-               box-shadow: 0 0 5px 5px #888;
-           }
+          .cacher{visibility:hidden}#chat-plus{position:relative;height:auto}#chat-minus{background-color:#043867}#chat-messages{display:block;height:140px;overflow-y:scroll}.media-icon{font-size:20px}.container{position:relative}#chat-head{border:solid 1px #d8e7f8;background-color:#fafcfe}#chat-body{margin-bottom:40px;position:static;background-color:#3b725e;border:solid 1px #d8e7f8 }#text-input{overflow-y:hidden;height:50px;margin-bottom:10px}p{color:white}.icons{width:35px;height:35px;border-radius:35px}textarea{padding:0px;width:278px;height:100%;display:inline-block;outline:0px;border-width:0px;resize:none;border-width:1px;border-color:black;border-style:solid;font-size:12px;padding:10px;border-top-width:0px}.glyphicon:hover{color:forestgreen}#date{text-decoration-line:underline}#foot{bottom:0px;position:fixed}.commentArea{font:12px Arial;padding:0 10px;margin-top:20px}.bubbledLeft,.bubbledRight{margin-top:20px;padding:5px 9px;max-width:50%;clear:both;position:relative;list-style:none}.bubbledLeft{float:left;margin-right:auto;-webkit-border-radius:8px 8px 8px 0px;-moz-border-radius:8px 8px 8px 0px;-o-border-radius:8px 8px 8px 0px;-ms-border-radius:8px 8px 8px 0px;border-radius:8px 8px 8px 0px;background-color:#65B045;color:#fff}.bubbledLeft:before{border-bottom:10px solid #65B045;border-left:9px solid rgba(0,0,0,0);position:absolute;bottom:0;left:-8px;content:""}.bubbledRight{float:right;margin-left:auto;text-align:right;-webkit-border-radius:8px 8px 0px 8px;-moz-border-radius:8px 8px 0px 8px;-o-border-radius:8px 8px 0px 8px;-ms-border-radius:8px 8px 0px 8px;border-radius:8px 8px 0px 8px;background-color:#07D;color:white}.bubbledRight:before{border-bottom:9px solid #07D;border-right:9px solid rgba(0,0,0,0);position:absolute;bottom:0;right:-8px;content:""}.textLeft{background:#65B045}.textRight{background:#07D}.wide{width:1800px !important;height:1800px !important}.small{width:400px !important;height:400px !important}#audio{-moz-box-shadow:0 0 5px 5px #888;-webkit-box-shadow:0 0 5px 5px#888;box-shadow:0 0 5px 5px #888}
        </style>
        <meta name="viewport" content="width=device-width, initial-scale=1.0" charset="utf-8">
        <title></title>
@@ -134,11 +13,9 @@
        <link rel="stylesheet" href="css/custom-theme/jquery-ui-1.10.0.custom.css">
        <link rel="stylesheet" href="assets/css/font-awesome.min.css">
        <link rel="stylesheet" href="assets/css/docs.css">
-       <link rel="stylesheet" href="assets/js/google-code-prettify/prettify.css">
-       
-   <script src="js/jquery-2.2.0.min.js"></script>
+       <link rel="stylesheet" href="assets/js/google-code-prettify/prettify.css"> 
+       <script src="js/jquery-2.2.0.min.js"></script>
        <script src="js/ion.sound.js"></script>
-       
        <script src="js/timer.jquery.js"></script>
        
     </head>
@@ -605,50 +482,10 @@
         $('#foot').draggable({ containment: 'document' });
         $('#chat-plus' ).draggable({ containment: 'document' });
     });
-</script>
-<script src="assets/js/google-code-prettify/prettify.js" type="text/javascript"></script>
-          <style>
-            
-            .ui-widget.success-dialog {
-    font-family: Verdana,Arial,sans-serif;
-    font-size: .8em;
-}
-
-.ui-widget-content.success-dialog {
-    background: #F9F9F9;
-    border: 1px solid #90d93f;
-    color: #222222;
-}
-
-.ui-dialog.success-dialog {
-    left: 0;
-    outline: 0 none;
-    padding: 0 !important;
-    position: absolute;
-    top: 0;
-}
-
-.ui-dialog.success-dialog .ui-dialog-content {
-    background: none repeat scroll 0 0 transparent;
-    border: 0 none;
-    overflow: auto;
-    position: relative;
-    padding: 0 !important;
-    margin: 0;
-}
-
-.ui-dialog.success-dialog .ui-widget-header {
-    background: #fafcfe;
-    border: 0;
-    color: #fff;
-    font-weight: normal;
-}
-
-.ui-dialog.success-dialog .ui-dialog-titlebar {
-    padding: 0.1em .5em;
-    position: relative;
-    font-size: 1em;
-}
-            </style>
+    </script>
+    <script src="assets/js/google-code-prettify/prettify.js" type="text/javascript"></script>
+    <style>
+       .ui-widget.success-dialog{font-family:Verdana,Arial,sans-serif;font-size: .8em}.ui-widget-content.success-dialog{background:#F9F9F9;border:1px solid #90d93f;color:#222}.ui-dialog.success-dialog{left:0;outline:0 none;padding:0 !important;position:absolute;top:0}.ui-dialog.success-dialog .ui-dialog-content{background:none repeat scroll 0 0 transparent;border:0 none;overflow:auto;position:relative;padding:0 !important;margin:0}.ui-dialog.success-dialog .ui-widget-header{background:#fafcfe;border:0;color:#fff;font-weight:normal}.ui-dialog.success-dialog .ui-dialog-titlebar{padding:0.1em .5em;position:relative;font-size:1em}
+    </style>
 </body>
 </html>
