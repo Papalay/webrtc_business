@@ -17,7 +17,6 @@
        <script src="js/jquery-2.2.0.min.js"></script>
        <script src="js/ion.sound.js"></script>
        <script src="js/timer.jquery.js"></script>
-       
     </head>
     <body id="body">
         <div class="container row" id="chatbox" style=" vertical-align: top;">   
@@ -35,7 +34,7 @@
                 </div>
                 <div id="remote" style="width:100%;" title="Remote video"></div>
                 <div id="mini"></div>
-                <div id="audio" style="display: none; height:50px; width : 180px;" class="col-xs-4 bg-info fa-border">
+                <div id="audio" style="display: none; height:50px; width : 250px; margin-left : 10px; margin-right : 10px;" class="col-xs-4 bg-info fa-border">
                            <div id="timer"></div>
                            <i class="fa fa-spinner fa-pulse fa-3x fa-fw margin-bottom" style="margin-left : 60px;" id="call-going"></i>
                 </div>
@@ -73,7 +72,6 @@
                                 <i class="fa fa-circle-o faa-burst animated " style="background-color : white;"></i>
                             </div>
                         </div>
-                          
                     </div>
                 </div>
             </div>
@@ -158,12 +156,14 @@
             $('#chat-icon').css({'display': 'block'});
             $('#chat-messages').animate({scrollTop: $('#chat-messages')[0].scrollHeight},2000);    
         }    
-    }            
+    }
+        /* Formattage de l'heure */
     function getHeure(date){
         var heures = ("0" +date.getHours()).slice('-2');
         var minutes = ("0" +date.getMinutes()).slice('-2');
         return (heures+ ":"+minutes);
     }
+        /* Obtention de la liste des agents connectés*/
     function receiveInfo(e){
         date =  e.detail.time.getDate()+"/"+(e.detail.time.getMonth()+1)+"/"+e.detail.time.getFullYear();
         $('#date').css({'display' : 'block'});
@@ -187,17 +187,22 @@
             }
         }, 3000);
     }
+        /* Mise à jour du statut de l'agent en ligne*/
     function updateStatus(userId, state){
-         if(state !='no_Call'){
+        //Si l'agent est disponible, @no_Call signifie aps en cours de communication   
+        if(state !='no_Call'){
              $('#contacts').find('[id='+userId+']').remove();
              lastUsers.splice(lastUsers.indexOf(userId), 1);
              $('#contacts').append('<tr id='+userId+'><td><img src= "images/image-1.png" style="height : 40px; width : 40px;"><button         class="btn btn-danger agent">'+userId+'</button></td></tr>'); 
-         }else{
+         }
+        //Sinon soit l'agent est en communication ou il est en train d'être contacté par un client 
+        else{
              $('#contacts').find('[id='+userId+']').remove();
              lastUsers.splice(lastUsers.indexOf(userId), 1);
              $('#contacts').append('<tr id='+userId+'><td><img src="images/image-1.png" style ="height:40px; width :    40px;">   <button class="btn btn-success agent">'+userId+'</button></td></tr>');
          }
     }
+        /* Cette fonction permet d'ajouter un stream(audio, video, screen sharing) dans un div*/
     function addStreamInDiv(stream, callType, divId, mediaEltId, style, muted) {
         var mediaElt = null,
             divElement = null;
@@ -215,6 +220,7 @@
         divElement.appendChild(mediaElt);
         webRTCClient.attachMediaStream(mediaElt, stream);
     }
+        /* Suppression d'un element dans un div*/
     function removeElementFromDiv(divId, eltId) {
         var element = null,
             divElement = null;    
@@ -224,16 +230,12 @@
             divElement.removeChild(element);
         }
     }
+        /* Fonction supprimant un media après qu'un pair ai raccroché*/
     function initMediaElementState(callId) {
-            //function that remove media element on hangup
-            //You can decide to manage your own stream display function or use the integrated one of ApiRTC
-            /*
-                removeElementFromDiv('mini', 'miniElt-' + callId)
-                removeElementFromDiv('remote', 'remoteElt-' + callId)
-            */
-                webRTCClient.removeElementFromDiv('mini', 'miniElt-' + callId);
-                webRTCClient.removeElementFromDiv('remote', 'remoteElt-' + callId);        
+        webRTCClient.removeElementFromDiv('mini', 'miniElt-' + callId);
+        webRTCClient.removeElementFromDiv('remote', 'remoteElt-' + callId);        
     }
+        /**/
     function addHangupButton(callId) {
         var hangupButtons = document.getElementById("hangupButtons"),
             input = document.createElement("input");
@@ -252,8 +254,9 @@
         }        
     }
     function userMediaErrorHandler(e) {
-        $("#hangup").attr("disabled", false).val("Raccrocher");
-    }            
+        $("#hangup").attr("disabled", false);
+    }
+    /* Evénement qui se déclanche lorsque le pair distant raccroche*/
     function hangupHandler(e) {        
         initMediaElementState(e.detail.callId);            
         removeHangupButton(e.detail.callId);            
@@ -267,11 +270,13 @@
         jQuery('#media').dialog('close');
          $('#timer').timer('remove');
     }
+        /*Evénement qui se déclanche à la réception d'un appel*/
     function incomingCallHandler(e) {
          $('#media').dialog('open');
         addHangupButton(e.detail.callId);
         incomingCallId = e.detail.callId;
         callerId = e.detail.callerId;
+        //Si l'appel est un media
         if(e.detail.callType == 'media'){
             $("#hangup").attr("disabled", true);
             $('#menu').show('explode');
@@ -279,6 +284,7 @@
             $("#refuse").attr("disabled", false);
             ion.sound.play("iphone");
         }
+        // Traîtement particulier s'il  s'agit d'un audio
         if(e.detail.callType == 'audio'){
             callType = e.detail.callType;
             $("#hangup").attr("disabled", true);
@@ -287,38 +293,33 @@
             $("#refuse").attr("disabled", false);
             ion.sound.play("iphone");
             $('#audio').css({'display': 'block'});
-        }         
+        }  
+        //Cas d'un partage d'écran
         if(e.detail.callType == 'screenSharing'){
             $('#menuScreenSharing').show('explode');
         }
     }
+        /*Ajout de la vidéo local dans un div et le son de la vidéo est coupé (muted=true)
+        Cette fonctionnalié est supprimée
+        */
     function userMediaSuccessHandler(e) {
-                //Adding local Stream in Div. Video is muted
-            //You can decide to manage your own stream display function or use the integrated one of ApiRTC
-            /*
-                addStreamInDiv(e.detail.stream, e.detail.callType, "mini", 'miniElt-' + e.detail.callId,
-                               {width : "160px", height : "120px"}, true);
-            */  
-                webRTCClient.addStreamInDiv(e.detail.stream, e.detail.callType, "mini", 'miniElt-' + e.detail.callId,
+        webRTCClient.addStreamInDiv(e.detail.stream, e.detail.callType, "mini", 'miniElt-' + e.detail.callId,
                                {width : "140px", height : "120px"}, true);
     }
-    function remoteStreamAddedHandler(e) {
-                //Adding Remote Stream in Div. Video is not muted
-            //You can decide to manage your own stream display function or use the integrated one of ApiRTC
-            /*
-                addStreamInDiv(e.detail.stream, e.detail.callType, "remote", 'remoteElt-' + e.detail.callId,
-                               {width : "640px", height : "480px"}, false);
-            */
-                webRTCClient.addStreamInDiv(e.detail.stream, e.detail.callType, "remote", 'remoteElt-' + e.detail.callId,
+        /*Ajout de la vidéo distante dans un div , le son n'est pas coupé (muted = false)*/
+    function remoteStreamAddedHandler(e) { 
+        webRTCClient.addStreamInDiv(e.detail.stream, e.detail.callType, "remote", 'remoteElt-' + e.detail.callId,
                                {width : "640px", height : "480px"}, false);
     }
     function desktopCaptureHandler(e) {
                 console.log("e.detail.event :" + e.detail.event);
-    }     
+    } 
+        /*Fonction principale d'initialisation du client apiRTC*/
     function sessionReadyHandler(e){
         apiRTC.addEventListener("updatePresence", receiveInfo);
         apiRTC.addEventListener("receiveIMMessage", receiveIMMessageHandler);
-      // apiRTC.addEventListener("userMediaSuccess", userMediaSuccessHandler);
+        /* Suppression de la vidéo local*/
+        // apiRTC.addEventListener("userMediaSuccess", userMediaSuccessHandler);
         apiRTC.addEventListener("incomingCall", incomingCallHandler);
         apiRTC.addEventListener("userMediaError", userMediaErrorHandler);
         apiRTC.addEventListener("hangup", hangupHandler);
@@ -327,8 +328,7 @@
         
         imClient = apiCC.session.createIMClient();
         webRTCClient = apiRTC.session.createWebRTCClient({
-        });         
-                 
+        });           
         $(document).on('click', '.agent', function(e){
             $('#chat-plus').show('Scale'); 
             $('#chat-plus').css({'display' : 'block'});
@@ -369,13 +369,13 @@
                 }
             });
         });
-        //Multi calls Activation
+        //Activvation multi-call
         webRTCClient.setAllowMultipleCalls(true);
-        //Bandwitdh limitation
+        //Limitation de la bande passante
         webRTCClient.setVideoBandwidth(300);
-        //Accept-Refuse
+        //Acceptation-refus
         webRTCClient.setUserAcceptOnIncomingCall(true);
-        //ScreenSharing Activation
+        //Activation du partage d'écran
         webRTCClient.activateScreenSharing();
         $("#hangup").click(function () {
             webRTCClient.hangUp();
@@ -436,13 +436,7 @@
         $('#chat-messages').mouseleave( function(){
             $('.textLeft').hide('Scale');
             $('.textRight').hide('Scale');
-        });
-        $('#video-call').click( function(){
-           // $('#media').dialog('open');
-        });
-        $('#audio-call').click( function(){
-            //$('#media').dialog('open');
-        });        
+        });      
         jQuery("#media").dialog({
             autoOpen: false,
             dialogClass: 'no-close success-dialog',
@@ -457,8 +451,8 @@
             height : 'auto',
             width : 'auto',
             open: function(){
-              //  jQuery('.ui-dialog-titlebar').append("<img src='../images/atos.jpg' style = 'height:30px; width : 50px;'/>");
                 jQuery('.ui-widget-overlay').bind('click',function(){
+                    webRTCClient.hangUp();
                     jQuery('#media').dialog('close');
                 })
             }
